@@ -49,6 +49,17 @@ blueprint:
       selector:
         text:
           multiline: false
+    delay:
+      name: delay of TTS
+      description: Delay between door opening and TTS  
+      default: 3
+      selector:
+        number:
+          min: 0.0
+          max: 30.0
+          step: 1.0
+          unit_of_measurement: sec
+          mode: slider
     condition:
       name: Condition to run
       description: 'Add a value_template value for major condition to execute the automation'
@@ -87,6 +98,7 @@ action:
   value_template: !input 'condition'
 - condition: template
   value_template: "{{ persons_count|length > 0 }}"
+- delay: !input 'delay'
 - service: notify.mobile_app_galaxy_tab
   data:
     message: tts

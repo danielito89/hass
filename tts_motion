@@ -49,12 +49,6 @@ blueprint:
       selector:
         text:
           multiline: false
-    target:
-      name: Target devices
-      description: Target devices to play the TTS message
-      selector:
-        service:
-          domain: notify
     condition:
       name: Condition to run
       description: 'Add a value_template value for major condition to execute the automation'
@@ -95,8 +89,9 @@ action:
   value_template: "{{ persons_count|length > 0 }}"
 - service: notify.mobile_app_galaxy_tab
   data:
-    entity_id: !input 'target'
-    message: "{%- set single_lst = single_msg.split('\\n') -%}\n{%- set multiple_lst\
+    message: tts
+    data:
+      tts_text: "{%- set single_lst = single_msg.split('\\n') -%}\n{%- set multiple_lst\
       \ = multiple_msg.split('\\n') -%}\n{%- if persons_count|length > 1 -%}\n  {{\
       \ multiple_lst | random | replace('<persons>', persons_names) }}\n{%- elif persons_count|length > 0 -%}\n\
       \  {{ single_lst | random | replace('<person>', persons_names) }}\n{%- endif\

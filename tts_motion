@@ -45,7 +45,7 @@ blueprint:
     persons-concat:
       name: Text to concatenate the persons name
       description: String to be used as concatenate between names
-      default: ' and '
+      default: ' y '
       selector:
         text:
           multiline: false
@@ -54,7 +54,7 @@ blueprint:
       description: Target devices to play the TTS message
       selector:
         entity:
-          domain: media_player
+          domain: notify
     condition:
       name: Condition to run
       description: 'Add a value_template value for major condition to execute the automation'
@@ -93,7 +93,7 @@ action:
   value_template: !input 'condition'
 - condition: template
   value_template: "{{ persons_count|length > 0 }}"
-- service: tts.google_translate_say
+- service: notify.mobile_app_galaxy_tab
   data:
     entity_id: !input 'target'
     message: "{%- set single_lst = single_msg.split('\\n') -%}\n{%- set multiple_lst\

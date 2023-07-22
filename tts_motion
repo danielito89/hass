@@ -53,7 +53,7 @@ blueprint:
       name: Target devices
       description: Target devices to play the TTS message
       selector:
-        entity:
+        service:
           domain: notify
     condition:
       name: Condition to run

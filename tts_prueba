@@ -1,5 +1,5 @@
 blueprint:
-  name: [TEST> TTS al movimiento con personas en casa
+  name: TEST - TTS al movimiento con personas en casa
   description: Sends TTS message to a notify mobile when motion is detected with the person
     at home
   domain: automation

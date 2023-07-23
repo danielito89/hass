@@ -60,12 +60,6 @@ blueprint:
           step: 1.0
           unit_of_measurement: sec
           mode: slider
-    condition:
-      name: Condition to run
-      description: 'Add a value_template value for major condition to execute the automation'
-      default: 'True'
-      selector:
-        text:
     actions:
       name: Additional actions
       description: 'After the execution of the automation, run those actions.'
@@ -108,8 +102,6 @@ action:
       \ multiple_lst | random | replace('<persons>', persons_names) }}\n{%- elif persons_count|length > 0 -%}\n\
       \  {{ single_lst | random | replace('<person>', persons_names) }}\n{%- endif\
       \ -%}\n"
-- condition: template
-  value_template: "{{ addactions|length > 0 }}"
 - choose: []
   default: !input 'actions'
 mode: single

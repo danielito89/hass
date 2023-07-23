@@ -60,6 +60,12 @@ blueprint:
           step: 1.0
           unit_of_measurement: sec
           mode: slider
+    condition:
+      name: Condition to run
+      description: 'Add a value_template value for major condition to execute the automation'
+  value_template: !input 'condition'
+- condition: template
+  value_template: "{{ persons_count|length > 0 }}"
     actions:
       name: Additional actions
       description: 'After the execution of the automation, run those actions.'

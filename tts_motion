@@ -54,7 +54,7 @@ blueprint:
       description: Target devices to play the TTS message
       selector:
         entity:
-          domain: notify
+          domain: notify.notify
     condition:
       name: Condition to run
       description: 'Add a value_template value for major condition to execute the automation'

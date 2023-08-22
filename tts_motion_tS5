@@ -61,7 +61,7 @@ blueprint:
       default: []
       selector:
         action: {}
-  source_url: https://github.com/danielito89/hass/blob/main/tts_motion_notify
+  source_url: https://github.com/danielito89/hass/blob/main/tts_motion_tS5
 variables:
   persons_str: !input 'persons'
   persons_list: '{{ persons_str.split('','') | map(''trim'') | list }}'

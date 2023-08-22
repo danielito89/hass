@@ -92,6 +92,11 @@ action:
     message: tts
     data:
       tts_text: null
+- delay:
+      hours: 0
+      minutes: 0
+      seconds: 2
+      milliseconds: 0
 - service: notify.mobile_app_galaxy_tab
   data:
     message: TTS

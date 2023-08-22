@@ -89,6 +89,11 @@ action:
   value_template: "{{ persons_count|length > 0 }}"
 - service: notify.mobile_app_galaxy_tab
   data:
+    message: tts
+    data:
+      tts_text: null
+- service: notify.mobile_app_galaxy_tab
+  data:
     message: TTS
     data:
       tts_text: "{%- set single_lst = single_msg.split('\\n') -%}\n{%- set multiple_lst\

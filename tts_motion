@@ -1,5 +1,5 @@
 blueprint:
-  name: TTS on motion with persons at home
+  name: TTS al movimiento en casa al llegar
   description: Sends TTS message to a media_player when motion is detected with the person
     at home
   domain: automation

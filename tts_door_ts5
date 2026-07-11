@@ -1,7 +1,6 @@
 blueprint:
   name: TTS al abrir puerta al llegar
-  description: Sends TTS message to a media_player when door is open with the person
-    at home
+  description: Sends TTS message to a media_player when door is open with the person at home
   domain: automation
   input:
     door_sensor:
@@ -15,6 +14,7 @@ blueprint:
       selector:
         entity:
           domain: person
+          multiple: true
     minutes:
       name: Minutes
       description: Minutes between person at home and motion detected
@@ -28,17 +28,13 @@ blueprint:
           mode: slider
     message-single:
       name: Message single person
-      description: 'Message to salute single person. One possible message per line.
-        Use <person> tag to be replaced by person name.
-        '
+      description: 'Message to salute single person. One possible message per line. Use <person> tag to be replaced by person name.'
       selector:
         text:
           multiline: true
     message-multiple:
       name: Message multiple persons
-      description: 'Message multiple persons. One possible message per line. Use <persons>
-        tag to be replaced by person name.
-        '
+      description: 'Message multiple persons. One possible message per line. Use <persons> tag to be replaced by person name.'
       selector:
         text:
           multiline: true
@@ -62,52 +58,74 @@ blueprint:
       selector:
         action: {}
   source_url: https://github.com/danielito89/hass/blob/main/tts_motion_ts5
+
 variables:
-  persons_str: !input 'persons'
-  persons_list: '{{ persons_str.split('','') | map(''trim'') | list }}'
+  # ALERTA DE CAMBIO: persons_list ahora toma la lista directamente
+  persons_list: !input 'persons'
   timeout: !input 'minutes'
   concat_str: !input 'persons-concat'
-  addactions: !input actions
-  persons_count: "{%- set first = true -%} {%- set data = namespace(nomes=[]) -%}\
-    \ {%- for person in persons_list -%}\n  {%- if is_state(person, 'home') and (now()\
-    \ - states[person].last_changed).total_seconds() < timeout*60 -%}\n    {%- set\
-    \ data.nomes = data.nomes + [states[person].name] -%}\n  {%- endif -%}\n{%- endfor\
-    \ -%} {{ data.nomes }}\n"
-  persons_names: '{%- set finalstr = '', ''.join(persons_count) -%} {{ concat_str.join(finalstr.rsplit('',
-    '',1)) }}
-    '
+  addactions: !input 'actions'
   single_msg: !input 'message-single'
   multiple_msg: !input 'message-multiple'
+  
+  # Plantilla Jinja2 limpia usando bloques multilínea (>)
+  persons_count: >
+    {% set data = namespace(nomes=[]) %}
+    {% for person in persons_list %}
+      {% if is_state(person, 'home') and (now() - states[person].last_changed).total_seconds() < (timeout * 60) %}
+        {% set data.nomes = data.nomes + [state_attr(person, 'friendly_name')] %}
+      {% endif %}
+    {% endfor %}
+    {{ data.nomes }}
+
+  persons_names: >
+    {% set finalstr = ', '.join(persons_count) %}
+    {{ concat_str.join(finalstr.rsplit(', ', 1)) }}
+
 trigger:
-- platform: state
-  entity_id: !input 'door_sensor'
-  to: 'on'
+  - platform: state
+    entity_id: !input 'door_sensor'
+    to: 'on'
+
 action:
-- condition: template
-  value_template: !input 'condition'
-- condition: template
-  value_template: "{{ persons_count|length > 0 }}"
-- service: notify.mobile_app_galaxy_tab
-  data:
-    message: tts
+  - condition: template
+    value_template: !input 'condition'
+  
+  - condition: template
+    value_template: "{{ persons_count | length > 0 }}"
+  
+  # CAMBIO: "service:" ahora es "action:"
+  - action: notify.mobile_app_galaxy_tab
     data:
-      tts_text: Bienvenido a casa
-- delay:
+      message: TTS
+      data:
+        tts_text: Bienvenido a casa
+  
+  - delay:
       hours: 0
       minutes: 0
       seconds: 2
       milliseconds: 0
-- service: notify.mobile_app_galaxy_tab
-  data:
-    message: TTS
+  
+  # CAMBIO: "service:" ahora es "action:"
+  - action: notify.mobile_app_galaxy_tab
     data:
-      tts_text: "{%- set single_lst = single_msg.split('\\n') -%}\n{%- set multiple_lst\
-      \ = multiple_msg.split('\\n') -%}\n{%- if persons_count|length > 1 -%}\n  {{\
-      \ multiple_lst | random | replace('<persons>', persons_names) }}\n{%- elif persons_count|length > 0 -%}\n\
-      \  {{ single_lst | random | replace('<person>', persons_names) }}\n{%- endif\
-      \ -%}\n"
-- condition: template
-  value_template: "{{ addactions|length > 0 }}"
-- choose: []
-  default: !input 'actions'
+      message: TTS
+      data:
+        # Plantilla Jinja2 limpia para los mensajes
+        tts_text: >
+          {% set single_lst = single_msg.split('\n') %}
+          {% set multiple_lst = multiple_msg.split('\n') %}
+          {% if persons_count | length > 1 %}
+            {{ multiple_lst | random | replace('<persons>', persons_names) }}
+          {% elif persons_count | length > 0 %}
+            {{ single_lst | random | replace('<person>', persons_names) }}
+          {% endif %}
+
+  - condition: template
+    value_template: "{{ addactions | length > 0 }}"
+  
+  - choose: []
+    default: !input 'actions'
+
 mode: single

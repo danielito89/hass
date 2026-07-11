@@ -108,7 +108,7 @@ action:
       milliseconds: 0
   
   # CAMBIO: "service:" ahora es "action:"
-  - action: notify.mobile_app_galaxy_tab
+  - action: notify.mobile_app_tab_galaxy5
     data:
       message: TTS
       data:

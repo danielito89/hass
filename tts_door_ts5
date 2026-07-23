@@ -97,9 +97,8 @@ action:
   # CAMBIO: "service:" ahora es "action:"
   - action: notify.alexa_media_alexa
     data:
-      message: TTS
+      message: Bienvenido a casa
       data:
-        tts_text: Bienvenido a casa
         type: announce
   
   - delay:
@@ -111,10 +110,7 @@ action:
   # CAMBIO: "service:" ahora es "action:"
   - action: notify.alexa_media_alexa
     data:
-      message: TTS
-      data:
-        # Plantilla Jinja2 limpia para los mensajes
-        tts_text: >
+      message: >
           {% set single_lst = single_msg.split('\n') %}
           {% set multiple_lst = multiple_msg.split('\n') %}
           {% if persons_count | length > 1 %}
@@ -122,6 +118,8 @@ action:
           {% elif persons_count | length > 0 %}
             {{ single_lst | random | replace('<person>', persons_names) }}
           {% endif %}
+      data:
+        # Plantilla Jinja2 limpia para los mensajes
         type: announce
 
   - condition: template

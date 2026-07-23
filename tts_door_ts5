@@ -95,11 +95,12 @@ action:
     value_template: "{{ persons_count | length > 0 }}"
   
   # CAMBIO: "service:" ahora es "action:"
-  - action: notify.mobile_app_galaxy_tab
+  - action: notify.alexa_media_alexa
     data:
       message: TTS
       data:
         tts_text: Bienvenido a casa
+        type: announce
   
   - delay:
       hours: 0
@@ -108,7 +109,7 @@ action:
       milliseconds: 0
   
   # CAMBIO: "service:" ahora es "action:"
-  - action: notify.mobile_app_tab_galaxy5
+  - action: notify.alexa_media_alexa
     data:
       message: TTS
       data:
@@ -121,6 +122,7 @@ action:
           {% elif persons_count | length > 0 %}
             {{ single_lst | random | replace('<person>', persons_names) }}
           {% endif %}
+        type: announce
 
   - condition: template
     value_template: "{{ addactions | length > 0 }}"

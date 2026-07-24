@@ -4,11 +4,12 @@ blueprint:
   domain: automation
   input:
     door_sensor:
-      name: Motion sensor
+      name: Sensor de Puerta / Movimiento
       selector:
         entity:
           domain: binary_sensor
-          device_class: door
+          # Comenté el device_class para que te deje elegir cualquier sensor, sea de puerta o movimiento
+          # device_class: door 
     persons:
       name: Persons
       selector:
@@ -48,7 +49,7 @@ blueprint:
     condition:
       name: Condition to run
       description: 'Add a value_template value for major condition to execute the automation'
-      default: 'True'
+      default: '{{ true }}' # <-- Corregido para que sea una plantilla válida
       selector:
         text:
     actions:
@@ -57,10 +58,8 @@ blueprint:
       default: []
       selector:
         action: {}
-  source_url: https://github.com/danielito89/hass/blob/main/tts_motion_ts5
 
 variables:
-  # ALERTA DE CAMBIO: persons_list ahora toma la lista directamente
   persons_list: !input 'persons'
   timeout: !input 'minutes'
   concat_str: !input 'persons-concat'
@@ -68,18 +67,18 @@ variables:
   single_msg: !input 'message-single'
   multiple_msg: !input 'message-multiple'
   
-  # Plantilla Jinja2 limpia usando bloques multilínea (>)
-  persons_count: >
-    {% set data = namespace(nomes=[]) %}
-    {% for person in persons_list %}
-      {% if is_state(person, 'home') and (now() - states[person].last_changed).total_seconds() < (timeout * 60) %}
-        {% set data.nomes = data.nomes + [state_attr(person, 'friendly_name')] %}
-      {% endif %}
-    {% endfor %}
+  # Usamos >- y {%- para evitar que los espacios rompan el formato de Lista
+  persons_count: >-
+    {%- set data = namespace(nomes=[]) -%}
+    {%- for person in persons_list -%}
+      {%- if is_state(person, 'home') and (now() - states[person].last_changed).total_seconds() < (timeout | float(0) * 60) -%}
+        {%- set data.nomes = data.nomes + [state_attr(person, 'friendly_name')] -%}
+      {%- endif -%}
+    {%- endfor -%}
     {{ data.nomes }}
 
-  persons_names: >
-    {% set finalstr = ', '.join(persons_count) %}
+  persons_names: >-
+    {%- set finalstr = ', '.join(persons_count) -%}
     {{ concat_str.join(finalstr.rsplit(', ', 1)) }}
 
 trigger:
@@ -94,7 +93,6 @@ action:
   - condition: template
     value_template: "{{ persons_count | length > 0 }}"
   
-  # CAMBIO: "service:" ahora es "action:"
   - action: notify.alexa_media_alexa
     data:
       message: Bienvenido a casa
@@ -107,7 +105,6 @@ action:
       seconds: 2
       milliseconds: 0
   
-  # CAMBIO: "service:" ahora es "action:"
   - action: notify.alexa_media_alexa
     data:
       message: >
@@ -119,7 +116,6 @@ action:
             {{ single_lst | random | replace('<person>', persons_names) }}
           {% endif %}
       data:
-        # Plantilla Jinja2 limpia para los mensajes
         type: announce
 
   - condition: template

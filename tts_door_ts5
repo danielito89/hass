@@ -116,7 +116,7 @@ action:
             {{ single_lst | random | replace('<person>', persons_names) }}
           {% endif %}
       data:
-        type: announce
+        type: tts
 
   - condition: template
     value_template: "{{ addactions | length > 0 }}"

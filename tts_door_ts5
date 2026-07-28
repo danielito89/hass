@@ -92,12 +92,7 @@ action:
   
   - condition: template
     value_template: "{{ persons_count | length > 0 }}"
-  
-  - action: notify.alexa_media_alexa
-    data:
-      message: Bienvenido a casa
-      data:
-        type: announce
+
   
   - delay:
       hours: 0
@@ -116,7 +111,7 @@ action:
             {{ single_lst | random | replace('<person>', persons_names) }}
           {% endif %}
       data:
-        type: tts
+        type: announce
 
   - condition: template
     value_template: "{{ addactions | length > 0 }}"

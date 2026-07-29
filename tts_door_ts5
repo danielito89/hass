@@ -93,6 +93,11 @@ action:
   - condition: template
     value_template: "{{ persons_count | length > 0 }}"
 
+  - action: media_player.volume_set
+    target:
+      entity_id: media_player.alexa_media_alexa
+    data:
+      volume_level: 0.6
   
   - delay:
       hours: 0
